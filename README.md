@@ -9,3 +9,6 @@ Written entirely in React Native
 
 ## Creation
 - Created from `react-native init`
+
+### Sources
+- Quotes are from [here](https://github.com/JamesFT/Database-Quotes-JSON)

@@ -77,7 +77,7 @@ class GridMemorization extends Component {
             // Game is not running
             // Set titles and buttons
             this.setState({
-                gameControlButtonTitle: "Stop",
+                gameControlButtonTitle: "Check",
                 gameIsActive: true,
                 gameTitle: "Memorize the pattern!"
             })

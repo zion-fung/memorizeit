@@ -12,6 +12,7 @@ import Binary from "./games/Binary";
 import Home from "./Home";
 import Shapes from "./games/Shapes";
 import Quotes from "./games/Quotes";
+import GameSelection from "./games/GameSelection";
 
 const MainNavigator = createStackNavigator({
     Home: {
@@ -28,6 +29,9 @@ const MainNavigator = createStackNavigator({
     },
     Quotes: {
         screen: Quotes
+    },
+    GameSelection: {
+        screen: GameSelection
     }
 }, {
     initialRouteName: "Home"

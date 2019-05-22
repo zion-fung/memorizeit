@@ -1,7 +1,7 @@
 import React, { Component } from "react";
-import { StyleSheet, View } from "react-native";
+import { View } from "react-native";
 import { Grid, Row, Col } from "react-native-easy-grid";
-import { Button, Text } from "react-native-elements";
+import { Text } from "react-native-elements";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons"
 
 const emoticons = ["emoticon-happy-outline", "emoticon-neutral-outline", "emoticon-sad-outline", "emoticon-wink-outline"]
@@ -21,7 +21,14 @@ export default class Shapes extends Component {
         clearTimeout(timeout)
     }
     static navigationOptions = {
-        header: null
+        headerRight: <Icon style={{ position: "absolute", right: 10 }}
+            size={40}
+            name="help"
+            raised
+            color="white"
+        />,
+        headerTintColor: "white",
+        headerStyle: { backgroundColor:"#2089dc" }
     }
     addUserEmoticon(index) {
         if(!this.state.gameIsActive) {
@@ -118,26 +125,6 @@ export default class Shapes extends Component {
         const { navigate } = this.props.navigation
         return (
             <Grid style={{ backgroundColor: "#e2dd7c"}}>
-                <Row size={1}>
-                    <Col size={1} style={{margin: 15}}>
-                        <Icon
-                            name="home"
-                            size={50}
-                            color="black"
-                            reverse
-                            onPress={() => navigate("Home")}
-                        />
-                    </Col>
-                    <Col size={5}></Col>
-                    <Col size={1} style={{margin: 15}}>
-                        <Icon style={{position: "absolute", right: 0}}
-                            size={50}
-                            name="help"
-                            raised
-                            color="#ea4c33"
-                        />
-                    </Col>
-                </Row>
                 <Row size={1} style={{alignItems: "center", justifyContent: "center"}}>
                     <Text h3>{this.state.gameTitle}</Text>
                 </Row>

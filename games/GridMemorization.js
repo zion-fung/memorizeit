@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { Text, StyleSheet } from "react-native";
 import { Grid, Row, Col } from "react-native-easy-grid";
 import { Button } from "react-native-elements";
-import Icon from "react-native-vector-icons/Ionicons"
+import Icon from "react-native-vector-icons/MaterialCommunityIcons"
 
 let timeout = null
 class GridMemorization extends Component {
@@ -20,15 +20,22 @@ class GridMemorization extends Component {
         clearTimeout(timeout)
     }
     static navigationOptions = {
-        header: null
+        headerRight: <Icon style={{ position: "absolute", right: 10 }}
+            size={40}
+            name="help"
+            raised
+            color="white"
+        />,
+        headerTintColor: "white",
+        headerStyle: { backgroundColor:"#2089dc" }
     }
     generateGrid(rowCount, colCount) {
         let rows = []
-        for(let r = 0;r < rowCount;r++) {
+        for (let r = 0; r < rowCount; r++) {
             let cols = []
-            for(let c = 0;c < colCount;c++) {
+            for (let c = 0; c < colCount; c++) {
                 cols.push(
-                    <Col key={c.toString()} size={1} style={{backgroundColor: this.state.colorStates[r][c], margin: 6}} onPress={() => {
+                    <Col key={c.toString()} size={1} style={{ backgroundColor: this.state.colorStates[r][c], margin: 6 }} onPress={() => {
                         this.flipColor(r, c)
                     }}>
                     </Col>
@@ -44,10 +51,10 @@ class GridMemorization extends Component {
     }
     generateColorStates(rowCount, colCount) {
         let states = []
-        for(let r = 0;r < rowCount;r++) {
+        for (let r = 0; r < rowCount; r++) {
             let row = []
-            for(let c = 0;c < colCount;c++) {
-                row.push("blue")
+            for (let c = 0; c < colCount; c++) {
+                row.push("#2089dc")
             }
             states.push(row)
         }
@@ -55,29 +62,29 @@ class GridMemorization extends Component {
     }
     generateRandomColorStates(rowCount, colCount) {
         let states = []
-        for(let r = 0;r < rowCount;r++) {
+        for (let r = 0; r < rowCount; r++) {
             let row = []
-            for(let c = 0;c < colCount;c++) {
+            for (let c = 0; c < colCount; c++) {
                 let random = Math.floor(Math.random() * 2)
-                random === 0 ? row.push("red") : row.push("blue")
+                random === 0 ? row.push("red") : row.push("#2089dc")
             }
             states.push(row)
         }
         return states
     }
     flipColor(row, col) {
-        if(!this.state.gameIsActive) {
+        if (!this.state.gameIsActive) {
             return
         }
         let colorStates = this.state.colorStates
-        let color = colorStates[row][col] === "blue" ? "red" : "blue"
+        let color = colorStates[row][col] === "#2089dc" ? "red" : "#2089dc"
         colorStates[row][col] = color
         this.setState({
             colorStates: colorStates
         })
     }
     initiateGameControl() {
-        if(!this.state.gameIsActive) {
+        if (!this.state.gameIsActive) {
             // Game is not running
             // Set titles and buttons
             this.setState({
@@ -111,9 +118,9 @@ class GridMemorization extends Component {
             let userStates = this.state.colorStates
             let correctStates = this.state.correctColorStates
             // Tell user if they're correct or not
-            for(let r = 0;r < 4;r++) {
-                for(let c = 0;c < 4;c++) {
-                    if(userStates[r][c] !== correctStates[r][c]) {
+            for (let r = 0; r < 4; r++) {
+                for (let c = 0; c < 4; c++) {
+                    if (userStates[r][c] !== correctStates[r][c]) {
                         alert("You got it wrong...\nMaybe next time!")
                         this.setState({
                             colorStates: this.generateColorStates(4, 4),
@@ -133,32 +140,12 @@ class GridMemorization extends Component {
     render() {
         const { navigate } = this.props.navigation
         const grid = this.generateGrid(4, 4)
-        return(
+        return (
             <Grid>
-                <Row size={1}>
-                    <Col size={1} style={{margin: 15}}>
-                        <Icon
-                            name="md-home"
-                            size={50}
-                            color="black"
-                            reverse
-                            onPress={() => navigate("Home")}
-                        />
-                    </Col>
-                    <Col size={5}></Col>
-                    <Col size={1} style={{margin: 15}}>
-                        <Icon style={{position: "absolute", right: 0}}
-                            size={50}
-                            name="md-help"
-                            raised
-                            color="#ea4c33"
-                        />
-                    </Col>
-                </Row>
                 <Row size={2}>
                     <Col size={1}></Col>
-                    <Col size={5} style={{justifyContent: "center", alignItems: "center"}}>
-                        <Text style={{fontSize: 25, fontWeight: "bold"}}>{this.state.gameTitle}</Text>
+                    <Col size={5} style={{ justifyContent: "center", alignItems: "center" }}>
+                        <Text style={{ fontSize: 25, fontWeight: "bold" }}>{this.state.gameTitle}</Text>
                     </Col>
                     <Col size={1}></Col>
                 </Row>
@@ -174,7 +161,7 @@ class GridMemorization extends Component {
                     <Grid>
                         <Col size={1}></Col>
                         <Col size={2}>
-                            <Button 
+                            <Button
                                 title={this.state.gameControlButtonTitle}
                                 onPress={() => this.initiateGameControl()}
                                 disabled={this.state.gameControlButtonStatus}
@@ -189,20 +176,12 @@ class GridMemorization extends Component {
 }
 
 const styles = StyleSheet.create({
-    red: {
-        backgroundColor: "red",
-        margin: 1
-    },
-    blue: {
-        backgroundColor: "blue",
-        margin: 1
-    },
     grid: {
-        backgroundColor: "gray",
+        backgroundColor: "#383838",
         padding: 3
     },
     col: {
-        backgroundColor: "blue",
+        backgroundColor: "#2089dc",
         margin: 6
     }
 })

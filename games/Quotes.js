@@ -19,7 +19,14 @@ export default class Quotes extends Component {
         }
     }
     static navigationOptions = {
-        header: null
+        headerRight: <Icon style={{ position: "absolute", right: 10 }}
+            size={40}
+            name="help"
+            raised
+            color="white"
+        />,
+        headerTintColor: "white",
+        headerStyle: { backgroundColor:"#2089dc" }
     }
     checkAnswers() {
         // console.log("User answers:", this.state.userText, this.state.userAuthor)
@@ -112,26 +119,6 @@ export default class Quotes extends Component {
                         ></Button>
                     </ScrollView>
                 </Overlay>
-                <Row size={1}>
-                    <Col size={1} style={{ margin: 15 }}>
-                        <Icon
-                            name="home"
-                            size={50}
-                            color="black"
-                            reverse
-                            onPress={() => navigate("Home")}
-                        />
-                    </Col>
-                    <Col size={5}></Col>
-                    <Col size={1} style={{ margin: 15 }}>
-                        <Icon style={{ position: "absolute", right: 0 }}
-                            size={50}
-                            name="help"
-                            raised
-                            color="#ea4c33"
-                        />
-                    </Col>
-                </Row>
                 <Row size={1} style={{ alignItems: "center", justifyContent: "center" }}>
                     <Text h4>{this.state.gameTitle}</Text>
                 </Row>

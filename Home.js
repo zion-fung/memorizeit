@@ -3,7 +3,6 @@ import { StyleSheet, View, Animated } from "react-native";
 import { Button, Text } from "react-native-elements";
 import LinearGradient from "react-native-linear-gradient";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons"
-import { withNavigationFocus } from "react-navigation"
 
 let didBlurSubscription = null
 let didFocusSubscription = null

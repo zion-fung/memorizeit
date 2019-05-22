@@ -47,7 +47,7 @@ export default class Quotes extends Component {
         if (!this.state.gameIsActive) {
             let random = Math.floor(Math.random() * this.state.quoteLength)
             let words = quotes[random].quoteText.split(" ").length
-            while (words > 10) {
+            while (words > 10 && quotes[random].quoteAuthor !== "") {
                 random = Math.floor(Math.random() * this.state.quoteLength)
                 words = quotes[random].quoteText.split(" ").length
             }

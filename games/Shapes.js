@@ -71,15 +71,15 @@ export default class Shapes extends Component {
                 that.setState({
                     displayEmoticon: solution[i]
                 })
-                setTimeout(() => {
+                timeout = setTimeout(() => {
                     that.setState({
                         displayEmoticon: ""
                     })
                 }, 450)
-                setTimeout(() => {
+                timeout = setTimeout(() => {
                     i += 1
                     if(i < 5) {
-                        setTimeout(run)
+                        timeout = setTimeout(run)
                     } else {
                         that.setState({
                             gameTitle: "Enter the sequence!"

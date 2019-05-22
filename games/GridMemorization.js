@@ -4,6 +4,7 @@ import { Grid, Row, Col } from "react-native-easy-grid";
 import { Button } from "react-native-elements";
 import Icon from "react-native-vector-icons/Ionicons"
 
+let timeout = null
 class GridMemorization extends Component {
     constructor(props) {
         super(props)
@@ -14,6 +15,9 @@ class GridMemorization extends Component {
             gameControlButtonStatus: false,
             gameTitle: "Press Start!"
         }
+    }
+    componentWillUnmount() {
+        clearTimeout(timeout)
     }
     static navigationOptions = {
         header: null
@@ -90,7 +94,7 @@ class GridMemorization extends Component {
             })
             // Wait a certain amount of time
             // Switch to default colorStates
-            setTimeout(() => {
+            timeout = setTimeout(() => {
                 this.setState({
                     colorStates: this.generateColorStates(4, 4),
                     // Tell user to enter pattern

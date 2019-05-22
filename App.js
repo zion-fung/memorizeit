@@ -10,7 +10,7 @@ import {createStackNavigator, createAppContainer} from 'react-navigation';
 import GridMemorization from "./games/GridMemorization";
 import Binary from "./games/Binary";
 import Home from "./Home";
-import Shapes from "./games/Shapes";
+import Pictures from "./games/Pictures";
 import Quotes from "./games/Quotes";
 import GameSelection from "./games/GameSelection";
 
@@ -24,8 +24,8 @@ const MainNavigator = createStackNavigator({
     Binary: {
         screen: Binary
     },
-    Shapes: {
-        screen: Shapes
+    Pictures: {
+        screen: Pictures
     },
     Quotes: {
         screen: Quotes

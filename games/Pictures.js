@@ -6,7 +6,7 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons"
 
 const emoticons = ["emoticon-happy-outline", "emoticon-neutral-outline", "emoticon-sad-outline", "emoticon-wink-outline"]
 let timeout = null
-export default class Shapes extends Component {
+export default class Pictures extends Component {
     constructor(props) {
         super(props)
         this.state = {

@@ -48,7 +48,7 @@ export default class GameSelection extends Component {
                             <Button
                                 title="Pictures"
                                 raised
-                                onPress={() => navigate("Shapes")}
+                                onPress={() => navigate("Pictures")}
                             />
                         </View>
                     </View>

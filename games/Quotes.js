@@ -29,7 +29,6 @@ export default class Quotes extends Component {
         headerStyle: { backgroundColor:"#2089dc" }
     }
     checkAnswers() {
-        // console.log("User answers:", this.state.userText, this.state.userAuthor)
         let correctText = this.state.quoteText.toLocaleLowerCase()
         let correctAuthor = this.state.quoteAuthor.toLocaleLowerCase()
         let userText = this.state.userText.toLocaleLowerCase()
@@ -54,35 +53,41 @@ export default class Quotes extends Component {
         if (!this.state.gameIsActive) {
             let random = Math.floor(Math.random() * this.state.quoteLength)
             let words = quotes[random].quoteText.split(" ").length
-            while (words > 10 && quotes[random].quoteAuthor !== "") {
+            let authorWords = quotes[random].quoteAuthor.split(" ").length
+            while (words > 10 || quotes[random].quoteAuthor === "" || authorWords > 2) {
                 random = Math.floor(Math.random() * this.state.quoteLength)
                 words = quotes[random].quoteText.split(" ").length
+                authorWords = quotes[random].quoteAuthor.split(" ").length
             }
             this.setState({
                 actionButtonTitle: "Check",
                 gameTitle: "Memorize as fast as you can!",
                 gameIsActive: true,
                 quoteText: quotes[random].quoteText,
-                quoteAuthor: quotes[random].quoteAuthor
+                quoteAuthor: quotes[random].quoteAuthor,
+                tempAuthor: quotes[random].quoteAuthor
             })
         } else {
             this.setState({
-                showAnswerOverlay: true
+                showAnswerOverlay: true,
+                quoteAuthor: ""
             })
         }
     }
     clearOverlay = () => {
+        let author = this.state.tempAuthor
         this.setState({
             showAnswerOverlay: false,
             userText: "",
-            userAuthor: ""
+            userAuthor: "",
+            quoteAuthor: author
         })
     }
     render() {
         const { navigate } = this.props.navigation
         return (
             <Grid>
-                <Overlay isVisible={this.state.showAnswerOverlay} onBackdropPress={this.clearOverlay} height="90%" width="90%"
+                <Overlay isVisible={this.state.showAnswerOverlay} onBackdropPress={this.clearOverlay} height="90%" width="90%" windowBackgroundColor="rgba(0, 0, 0, 0.8)"
                 >
                     <ScrollView>
                         <Header

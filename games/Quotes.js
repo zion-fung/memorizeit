@@ -15,6 +15,7 @@ export default class Quotes extends Component {
             gameIsActive: false,
             userText: "",
             userAuthor: "",
+            tempAuthor: "",
             quoteLength: quotes.length
         }
     }
@@ -30,7 +31,7 @@ export default class Quotes extends Component {
     }
     checkAnswers() {
         let correctText = this.state.quoteText.toLocaleLowerCase()
-        let correctAuthor = this.state.quoteAuthor.toLocaleLowerCase()
+        let correctAuthor = this.state.tempAuthor.toLocaleLowerCase()
         let userText = this.state.userText.toLocaleLowerCase()
         let userAuthor = this.state.userAuthor.toLocaleLowerCase()
         if (correctText === userText && correctAuthor === userAuthor) {
@@ -84,7 +85,6 @@ export default class Quotes extends Component {
         })
     }
     render() {
-        const { navigate } = this.props.navigation
         return (
             <Grid>
                 <Overlay isVisible={this.state.showAnswerOverlay} onBackdropPress={this.clearOverlay} height="90%" width="90%" windowBackgroundColor="rgba(0, 0, 0, 0.8)"

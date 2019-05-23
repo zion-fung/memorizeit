@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { View } from "react-native";
 import { Grid, Row, Col } from "react-native-easy-grid";
-import { Text } from "react-native-elements";
+import { Text, Overlay, Button, Header, Divider } from "react-native-elements";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons"
 
 const emoticons = ["emoticon-happy-outline", "emoticon-neutral-outline", "emoticon-sad-outline", "emoticon-wink-outline"]
@@ -11,10 +11,12 @@ export default class Pictures extends Component {
         super(props)
         this.state = {
             userInput: [],
-            displayEmoticon: "emoticon-happy-outline",
+            displayEmoticon: "",
             gameIsActive: false,
-            gameTitle: "Press the emoticon to start!",
-            solution: []
+            gameTitle: "Press start!",
+            solution: [],
+            showAnswerOverlay: false,
+            actionButtonTitle: "Start"
         }
     }
     componentWillUnmount() {
@@ -28,15 +30,15 @@ export default class Pictures extends Component {
             color="white"
         />,
         headerTintColor: "white",
-        headerStyle: { backgroundColor:"#2089dc" }
+        headerStyle: { backgroundColor: "#2089dc" }
     }
     addUserEmoticon(index) {
-        if(!this.state.gameIsActive) {
-            return
-        }
+        // if (!this.state.gameIsActive) {
+        //     return
+        // }
         let userInput = this.state.userInput
         const length = userInput.length
-        if(length == 12) {
+        if (length == 12) {
             return
         }
         userInput.push(
@@ -51,20 +53,16 @@ export default class Pictures extends Component {
             userInput: userInput
         })
     }
-    clearUserInput() {
-        this.setState({
-            userInput: []
-        })
-    }
     startGame() {
-        if(!this.state.gameIsActive) {
+        if (!this.state.gameIsActive) {
             this.setState({
                 gameTitle: "Memorize!",
                 gameIsActive: true,
-                displayEmoticon: ""
+                displayEmoticon: "",
+                actionButtonTitle: "Check"
             })
             let solution = []
-            for(let i = 0;i < 5;i++) {
+            for (let i = 0; i < 5; i++) {
                 let random = Math.floor(Math.random() * 4)
                 solution.push(emoticons[random])
             }
@@ -85,7 +83,7 @@ export default class Pictures extends Component {
                 }, 450)
                 timeout = setTimeout(() => {
                     i += 1
-                    if(i < 5) {
+                    if (i < 5) {
                         timeout = setTimeout(run)
                     } else {
                         that.setState({
@@ -94,102 +92,147 @@ export default class Pictures extends Component {
                     }
                 }, 600)
             }, 500)
+        } else {
+            this.setState({
+                showAnswerOverlay: true
+            })
         }
     }
     submitUserInput() {
-        if(this.state.gameIsActive) {
+        if (this.state.gameIsActive) {
             // console.log(this.state.userInput)
             // Check userInput against solution
             let userInput = this.state.userInput
             let solution = this.state.solution
-            this.setState({
-                gameTitle: "Press the emoticon to start!",
-                gameIsActive: false,
-                displayEmoticon: "emoticon-happy-outline",
-                userInput: []
-            })
-            if(userInput.length !== solution.length) {
-                alert("You were incorrect...\nMaybe next time!")
+            if (userInput.length !== solution.length) {
+                alert("You were incorrect...\nTry again!")
                 return
             }
-            for(let i = 0;i < userInput.length;i++) {
-                if(userInput[i].props.name !== solution[i]) {
-                    alert("You were incorrect...\nMaybe next time!")
+            for (let i = 0; i < userInput.length; i++) {
+                if (userInput[i].props.name !== solution[i]) {
+                    alert("You were incorrect...\nTry again!")
                     return
                 }
             }
             alert("You were correct! Congratulations!")
+            this.setState({
+                gameTitle: "Press start!",
+                gameIsActive: false,
+                displayEmoticon: "",
+                userInput: [],
+                showAnswerOverlay: false,
+                actionButtonTitle: "Start"
+            })
         }
     }
+    clearOverlay() {
+        this.setState({
+            showAnswerOverlay: false,
+            userInput: []
+        })
+    }
     render() {
-        const { navigate } = this.props.navigation
         return (
-            <Grid style={{ backgroundColor: "#e2dd7c"}}>
-                <Row size={1} style={{alignItems: "center", justifyContent: "center"}}>
+            <Grid style={{ backgroundColor: "#e2dd7c" }}>
+                <Overlay isVisible={this.state.showAnswerOverlay} onBackdropPress={() => this.clearOverlay()} height="90%" width="90%">
+                    <Grid>
+                        <Header
+                            leftComponent={
+                                <Icon
+                                    name="arrow-left"
+                                    color="white"
+                                    size={30}
+                                    onPress={() => this.clearOverlay()}
+                                />
+                            }
+                            centerComponent={
+                                <Text h4 style={{ color: "white" }}>Submit Answer</Text>
+                            }
+                        />
+                        <Row size={3} style={{ paddingTop: 10, paddingRight: 10, paddingLeft: 10, paddingBottom: 15, flexWrap: "wrap", borderColor: "gray", borderWidth: 2, margin: 10 }} >
+                            {this.state.userInput}
+                        </Row>
+                        <Row size={1}>
+                            <Col size={4}>
+                                <Button
+                                    title="Clear"
+                                    buttonStyle={{backgroundColor: "red"}}
+                                    onPress={() => this.setState({userInput: []})}
+                                />
+                            </Col>
+                            <Col size={1}></Col>
+                            <Col size={4}>
+                                <Button
+                                    title="Submit"
+                                    buttonStyle={{backgroundColor: "green"}}
+                                    onPress={() => this.submitUserInput()}
+                                />
+                            </Col>
+                        </Row>
+                        <Row size={1} style={{justifyContent: "center", alignItems: "flex-end"}}>
+                            <Text h4>Press the emoticons!</Text>
+                        </Row>
+                        <Row size={2}>
+                            <Col size={1} style={{ justifyContent: "center", alignItems: "center" }}>
+                                <Icon
+                                    color="black"
+                                    name="emoticon-happy-outline"
+                                    size={70}
+                                    onPress={() => this.addUserEmoticon(0)}
+                                    style={{backgroundColor: "#fffaa3", borderRadius: 40}}
+                                />
+                            </Col>
+                            <Col size={1} style={{ justifyContent: "center", alignItems: "center" }}>
+                                <Icon
+                                    color="black"
+                                    name="emoticon-neutral-outline"
+                                    size={70}
+                                    onPress={() => this.addUserEmoticon(1)}
+                                    style={{backgroundColor: "#fffaa3", borderRadius: 40}}
+                                />
+                            </Col>
+                            <Col size={1} style={{ justifyContent: "center", alignItems: "center" }}>
+                                <Icon
+                                    color="black"
+                                    name="emoticon-sad-outline"
+                                    size={70}
+                                    onPress={() => this.addUserEmoticon(2)}
+                                    style={{backgroundColor: "#fffaa3", borderRadius: 40}}
+                                />
+                            </Col>
+                            <Col size={1} style={{ justifyContent: "center", alignItems: "center" }}>
+                                <Icon
+                                    color="black"
+                                    name="emoticon-wink-outline"
+                                    size={70}
+                                    onPress={() => this.addUserEmoticon(3)}
+                                    style={{backgroundColor: "#fffaa3", borderRadius: 40}}
+                                />
+                            </Col>
+                        </Row>
+                    </Grid>
+                </Overlay>
+                <Row size={1} style={{ alignItems: "center", justifyContent: "center" }}>
                     <Text h3>{this.state.gameTitle}</Text>
                 </Row>
                 <Row size={3}>
-                    <Col size={1} style={{justifyContent: "center", alignItems: "center"}}>
-                        <Icon
-                            color="red"
-                            name="close"
-                            size={50}
-                            onPress={() => this.clearUserInput()}
-                        />
-                    </Col>
-                    <Col size={3} style={{ borderColor: "black", borderWidth: 5, backgroundColor: "lightblue", justifyContent: "center", alignItems: "center" }}>
-                        {this.state.displayEmoticon === "" ? <View></View>: <Icon 
+                    <Col size={1}></Col>
+                    <Col size={5} style={{ borderColor: "black", borderWidth: 5, backgroundColor: "lightblue", justifyContent: "center", alignItems: "center" }}>
+                        {this.state.displayEmoticon === "" ? <View></View> : <Icon
                             color="black"
                             name={this.state.displayEmoticon}
-                            size={120}
-                            onPress={() => this.startGame()}
+                            size={150}
                         />}
                     </Col>
-                    <Col size={1} style={{justifyContent: "center", alignItems: "center"}}>
-                        <Icon 
-                            color="green"
-                            name="check"
-                            size={50}
-                            onPress={() => this.submitUserInput()}
-                        />
-                    </Col>
+                    <Col size={1}></Col>
                 </Row>
-                <Row size={2} style={{paddingLeft: 15, paddingTop: 15, marginLeft: 15, marginRight: 15, marginTop: 15, backgroundColor: "#8ebee5", flexWrap: "wrap"}} >
-                    {this.state.userInput}
-                </Row>
-                <Row size={2}>
-                    <Col size={1} style={{ justifyContent: "center", alignItems: "center" }}>
-                        <Icon 
-                            color="black"
-                            name="emoticon-happy-outline"
-                            size={70}
-                            onPress={() => this.addUserEmoticon(0)}
-                        />
+                <Row size={1}></Row>
+                <Row size={1}>
+                    <Col size={1}></Col>
+                    <Col size={5}>
+                        <Button title={this.state.actionButtonTitle} onPress={() => this.startGame()} />
                     </Col>
-                    <Col size={1} style={{ justifyContent: "center", alignItems: "center" }}>
-                        <Icon 
-                            color="black"
-                            name="emoticon-neutral-outline"
-                            size={70}
-                            onPress={() => this.addUserEmoticon(1)}
-                        />
-                    </Col>
-                    <Col size={1} style={{ justifyContent: "center", alignItems: "center" }}>
-                        <Icon 
-                            color="black"
-                            name="emoticon-sad-outline"
-                            size={70}
-                            onPress={() => this.addUserEmoticon(2)}
-                        />
-                    </Col>
-                    <Col size={1} style={{ justifyContent: "center", alignItems: "center" }}>
-                        <Icon 
-                            color="black"
-                            name="emoticon-wink-outline"
-                            size={70}
-                            onPress={() => this.addUserEmoticon(3)}
-                        />
-                    </Col>
+                    <Col size={1}></Col>
                 </Row>
             </Grid>
         )

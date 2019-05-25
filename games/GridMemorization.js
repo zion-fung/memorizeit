@@ -1,10 +1,13 @@
 import React, { Component } from "react";
 import { Text, StyleSheet } from "react-native";
 import { Grid, Row, Col } from "react-native-easy-grid";
-import { Button } from "react-native-elements";
+import { Button, Overlay } from "react-native-elements";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons"
+import GridTutorial from "./tutorials/GridTutorial"
 
 let timeout = null
+const squareDefaultColor = "#2089dc";
+const squareFlipColor = "red";
 class GridMemorization extends Component {
     constructor(props) {
         super(props)
@@ -13,21 +16,32 @@ class GridMemorization extends Component {
             gameControlButtonTitle: "Start",
             gameIsActive: false,
             gameControlButtonStatus: false,
-            gameTitle: "Press Start!"
+            gameTitle: "Press Start!",
+            showTutorial: false,
+            canControlGame: true
         }
+    }
+    componentDidMount() {
+        this.props.navigation.setParams({
+            openTutorial: this.openTutorial
+        })
     }
     componentWillUnmount() {
         clearTimeout(timeout)
     }
-    static navigationOptions = {
-        headerRight: <Icon style={{ position: "absolute", right: 10 }}
-            size={40}
-            name="help"
-            raised
-            color="white"
-        />,
-        headerTintColor: "white",
-        headerStyle: { backgroundColor:"#2089dc" }
+    static navigationOptions = ({ navigation }) => {
+        return {
+            headerRight:
+                <Button
+                    icon={
+                        <Icon name="help" size={40} color="white" />
+                    }
+                    onPress={navigation.getParam("openTutorial")}
+                    type="clear"
+                />,
+            headerTintColor: "white",
+            headerStyle: { backgroundColor: squareDefaultColor }
+        }
     }
     generateGrid(rowCount, colCount) {
         let rows = []
@@ -54,7 +68,7 @@ class GridMemorization extends Component {
         for (let r = 0; r < rowCount; r++) {
             let row = []
             for (let c = 0; c < colCount; c++) {
-                row.push("#2089dc")
+                row.push(squareDefaultColor)
             }
             states.push(row)
         }
@@ -66,31 +80,35 @@ class GridMemorization extends Component {
             let row = []
             for (let c = 0; c < colCount; c++) {
                 let random = Math.floor(Math.random() * 2)
-                random === 0 ? row.push("red") : row.push("#2089dc")
+                random === 0 ? row.push(squareFlipColor) : row.push(squareDefaultColor)
             }
             states.push(row)
         }
         return states
     }
     flipColor(row, col) {
-        if (!this.state.gameIsActive) {
+        if (!this.state.canControlGame) {
             return
         }
         let colorStates = this.state.colorStates
-        let color = colorStates[row][col] === "#2089dc" ? "red" : "#2089dc"
+        let color = colorStates[row][col] === squareDefaultColor ? squareFlipColor : squareDefaultColor
         colorStates[row][col] = color
         this.setState({
             colorStates: colorStates
         })
     }
     initiateGameControl() {
+        if(!this.state.canControlGame) {
+            return
+        }
         if (!this.state.gameIsActive) {
             // Game is not running
             // Set titles and buttons
             this.setState({
                 gameControlButtonTitle: "Check",
                 gameIsActive: true,
-                gameTitle: "Memorize the pattern!"
+                gameTitle: "Memorize the pattern!",
+                canControlGame: false
             })
             // Generate random pattern
             // Set colorStates to random patterns
@@ -105,7 +123,8 @@ class GridMemorization extends Component {
                 this.setState({
                     colorStates: this.generateColorStates(4, 4),
                     // Tell user to enter pattern
-                    gameTitle: "Enter the pattern!"
+                    gameTitle: "Enter the pattern!",
+                    canControlGame: true
                 })
             }, 5000)
         } else {
@@ -137,11 +156,22 @@ class GridMemorization extends Component {
             })
         }
     }
+    closeTutorial = () => {
+        this.setState({
+            showTutorial: false
+        })
+    }
+    openTutorial = () => {
+        this.setState({
+            showTutorial: true
+        })
+    }
     render() {
         const { navigate } = this.props.navigation
         const grid = this.generateGrid(4, 4)
         return (
             <Grid>
+                <GridTutorial isVisible={this.state.showTutorial} onBackdropPress={this.closeTutorial} defaultColor={squareDefaultColor} flipColor={squareFlipColor} gridStyle={styles.grid}/>
                 <Row size={2}>
                     <Col size={1}></Col>
                     <Col size={5} style={{ justifyContent: "center", alignItems: "center" }}>
@@ -181,7 +211,7 @@ const styles = StyleSheet.create({
         padding: 3
     },
     col: {
-        backgroundColor: "#2089dc",
+        backgroundColor: squareDefaultColor,
         margin: 6
     }
 })

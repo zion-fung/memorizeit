@@ -129,7 +129,7 @@ export default class Quotes extends Component {
                 </Row>
                 <Row size={5}>
                     <Col size={1}></Col>
-                    <Col size={10} style={{ backgroundColor: "lightblue" }}>
+                    <Col size={10} style={{ backgroundColor: "lightblue", borderColor: "black", borderWidth: 3 }}>
                         <Row size={8}>
                             <Text h3 style={{ margin: 15 }}>{this.state.quoteText}</Text>
                         </Row>

@@ -22,15 +22,28 @@ export default class Pictures extends Component {
     componentWillUnmount() {
         clearTimeout(timeout)
     }
-    static navigationOptions = {
-        headerRight: <Icon style={{ position: "absolute", right: 10 }}
-            size={40}
-            name="help"
-            raised
-            color="white"
-        />,
-        headerTintColor: "white",
-        headerStyle: { backgroundColor: "#2089dc" }
+    componentDidMount() {
+        this.props.navigation.setParams({
+            openTutorial: this.openTutorial
+        })
+    }
+    openTutorial = () => {
+        const { navigate } = this.props.navigation
+        navigate("PicturesTutorial")
+    }
+    static navigationOptions = ({ navigation }) => {
+        return {
+            headerRight: <Button
+                icon={
+                    <Icon name="help" size={40} color="white" />
+                }
+                onPress={(navigation.getParam("openTutorial"))}
+                type="clear"
+            />,
+            headerTintColor: "white",
+            headerStyle: { backgroundColor: "#2089dc" },
+            headerTitle: "Pictures"
+        }
     }
     addUserEmoticon(index) {
         // if (!this.state.gameIsActive) {
@@ -133,7 +146,7 @@ export default class Pictures extends Component {
     }
     render() {
         return (
-            <Grid style={{ backgroundColor: "#e2dd7c" }}>
+            <Grid>
                 <Overlay isVisible={this.state.showAnswerOverlay} onBackdropPress={() => this.clearOverlay()} height="90%" width="90%">
                     <Grid>
                         <Header
@@ -156,20 +169,20 @@ export default class Pictures extends Component {
                             <Col size={4}>
                                 <Button
                                     title="Clear"
-                                    buttonStyle={{backgroundColor: "red"}}
-                                    onPress={() => this.setState({userInput: []})}
+                                    buttonStyle={{ backgroundColor: "red" }}
+                                    onPress={() => this.setState({ userInput: [] })}
                                 />
                             </Col>
                             <Col size={1}></Col>
                             <Col size={4}>
                                 <Button
                                     title="Submit"
-                                    buttonStyle={{backgroundColor: "green"}}
+                                    buttonStyle={{ backgroundColor: "green" }}
                                     onPress={() => this.submitUserInput()}
                                 />
                             </Col>
                         </Row>
-                        <Row size={1} style={{justifyContent: "center", alignItems: "flex-end"}}>
+                        <Row size={1} style={{ justifyContent: "center", alignItems: "flex-end" }}>
                             <Text h4>Press the emoticons!</Text>
                         </Row>
                         <Row size={2}>
@@ -179,7 +192,7 @@ export default class Pictures extends Component {
                                     name="emoticon-happy-outline"
                                     size={70}
                                     onPress={() => this.addUserEmoticon(0)}
-                                    style={{backgroundColor: "#fffaa3", borderRadius: 40}}
+                                    style={{ backgroundColor: "#fffaa3", borderRadius: 40 }}
                                 />
                             </Col>
                             <Col size={1} style={{ justifyContent: "center", alignItems: "center" }}>
@@ -188,7 +201,7 @@ export default class Pictures extends Component {
                                     name="emoticon-neutral-outline"
                                     size={70}
                                     onPress={() => this.addUserEmoticon(1)}
-                                    style={{backgroundColor: "#fffaa3", borderRadius: 40}}
+                                    style={{ backgroundColor: "#fffaa3", borderRadius: 40 }}
                                 />
                             </Col>
                             <Col size={1} style={{ justifyContent: "center", alignItems: "center" }}>
@@ -197,7 +210,7 @@ export default class Pictures extends Component {
                                     name="emoticon-sad-outline"
                                     size={70}
                                     onPress={() => this.addUserEmoticon(2)}
-                                    style={{backgroundColor: "#fffaa3", borderRadius: 40}}
+                                    style={{ backgroundColor: "#fffaa3", borderRadius: 40 }}
                                 />
                             </Col>
                             <Col size={1} style={{ justifyContent: "center", alignItems: "center" }}>
@@ -206,7 +219,7 @@ export default class Pictures extends Component {
                                     name="emoticon-wink-outline"
                                     size={70}
                                     onPress={() => this.addUserEmoticon(3)}
-                                    style={{backgroundColor: "#fffaa3", borderRadius: 40}}
+                                    style={{ backgroundColor: "#fffaa3", borderRadius: 40 }}
                                 />
                             </Col>
                         </Row>
@@ -217,7 +230,7 @@ export default class Pictures extends Component {
                 </Row>
                 <Row size={3}>
                     <Col size={1}></Col>
-                    <Col size={5} style={{ borderColor: "black", borderWidth: 5, backgroundColor: "lightblue", justifyContent: "center", alignItems: "center" }}>
+                    <Col size={5} style={{ borderColor: "black", borderWidth: 3, backgroundColor: "lightblue", justifyContent: "center", alignItems: "center" }}>
                         {this.state.displayEmoticon === "" ? <View></View> : <Icon
                             color="black"
                             name={this.state.displayEmoticon}

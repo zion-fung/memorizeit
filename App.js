@@ -13,6 +13,9 @@ import Home from "./Home";
 import Pictures from "./games/Pictures";
 import Quotes from "./games/Quotes";
 import GameSelection from "./games/GameSelection";
+import GridTutorial from "./games/tutorials/GridTutorial";
+import PicturesTutorial from "./games/tutorials/PicturesTutorial"
+import QuotesTutorial from "./games/tutorials/QuotesTutorial"
 
 const MainNavigator = createStackNavigator({
     Home: {
@@ -32,9 +35,19 @@ const MainNavigator = createStackNavigator({
     },
     GameSelection: {
         screen: GameSelection
+    },
+    GridTutorial: {
+        screen: GridTutorial
+    },
+    PicturesTutorial: {
+        screen: PicturesTutorial
+    },
+    QuotesTutorial: {
+        screen: QuotesTutorial
     }
 }, {
-    initialRouteName: "Home"
+    initialRouteName: "Home",
+    headerLayoutPreset: "center"
 });
 
 const App = createAppContainer(MainNavigator);

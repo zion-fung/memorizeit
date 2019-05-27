@@ -19,15 +19,28 @@ export default class Quotes extends Component {
             quoteLength: quotes.length
         }
     }
-    static navigationOptions = {
-        headerRight: <Icon style={{ position: "absolute", right: 10 }}
-            size={40}
-            name="help"
-            raised
-            color="white"
-        />,
-        headerTintColor: "white",
-        headerStyle: { backgroundColor:"#2089dc" }
+    componentDidMount() {
+        this.props.navigation.setParams({
+            openTutorial: this.openTutorial
+        })
+    }
+    openTutorial = () => {
+        const { navigate } = this.props.navigation
+        navigate("QuotesTutorial")
+    }
+    static navigationOptions = ({ navigation }) => {
+        return {
+            headerRight: <Button
+                icon={
+                    <Icon name="help" size={40} color="white" />
+                }
+                onPress={(navigation.getParam("openTutorial"))}
+                type="clear"
+            />,
+            headerTintColor: "white",
+            headerStyle: { backgroundColor: "#2089dc" },
+            headerTitle: "Quotes"
+        }
     }
     checkAnswers() {
         let correctText = this.state.quoteText.toLocaleLowerCase()

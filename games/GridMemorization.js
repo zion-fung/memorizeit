@@ -36,11 +36,12 @@ class GridMemorization extends Component {
                     icon={
                         <Icon name="help" size={40} color="white" />
                     }
-                    onPress={navigation.getParam("openTutorial")}
+                    onPress={(navigation.getParam("openTutorial"))}
                     type="clear"
                 />,
             headerTintColor: "white",
-            headerStyle: { backgroundColor: squareDefaultColor }
+            headerStyle: { backgroundColor: squareDefaultColor },
+            headerTitle: "Grid"
         }
     }
     generateGrid(rowCount, colCount) {
@@ -162,16 +163,18 @@ class GridMemorization extends Component {
         })
     }
     openTutorial = () => {
-        this.setState({
-            showTutorial: true
-        })
+        // this.setState({
+        //     showTutorial: true
+        // })
+        const { navigate } = this.props.navigation
+        navigate("GridTutorial")
     }
     render() {
         const { navigate } = this.props.navigation
         const grid = this.generateGrid(4, 4)
         return (
             <Grid>
-                <GridTutorial isVisible={this.state.showTutorial} onBackdropPress={this.closeTutorial} defaultColor={squareDefaultColor} flipColor={squareFlipColor} gridStyle={styles.grid}/>
+                {/* <GridTutorial isVisible={this.state.showTutorial} onBackdropPress={this.closeTutorial} defaultColor={squareDefaultColor} flipColor={squareFlipColor} gridStyle={styles.grid}/> */}
                 <Row size={2}>
                     <Col size={1}></Col>
                     <Col size={5} style={{ justifyContent: "center", alignItems: "center" }}>

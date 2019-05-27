@@ -106,6 +106,7 @@ class Home extends Component {
                         <Button
                             raised
                             title="Scores"
+                            onPress={() => navigate("Scores")}
                         />
                     </View>
                     <View style={{ flexGrow: 1 }}></View>

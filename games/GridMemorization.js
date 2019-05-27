@@ -3,7 +3,7 @@ import { Text, StyleSheet } from "react-native";
 import { Grid, Row, Col } from "react-native-easy-grid";
 import { Button, Overlay } from "react-native-elements";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons"
-import GridTutorial from "./tutorials/GridTutorial"
+import { incrementStreak, resetStreak } from "../storage/storage"
 
 let timeout = null
 const squareDefaultColor = "#2089dc";
@@ -98,7 +98,7 @@ class GridMemorization extends Component {
             colorStates: colorStates
         })
     }
-    initiateGameControl() {
+    async initiateGameControl() {
         if(!this.state.canControlGame) {
             return
         }
@@ -146,6 +146,7 @@ class GridMemorization extends Component {
                             colorStates: this.generateColorStates(4, 4),
                             gameTitle: "Press Start!"
                         })
+                        await resetStreak(0)
                         return
                     }
                 }
@@ -155,6 +156,7 @@ class GridMemorization extends Component {
                 colorStates: this.generateColorStates(4, 4),
                 gameTitle: "Press Start!"
             })
+            await incrementStreak(0)
         }
     }
     closeTutorial = () => {
@@ -163,9 +165,6 @@ class GridMemorization extends Component {
         })
     }
     openTutorial = () => {
-        // this.setState({
-        //     showTutorial: true
-        // })
         const { navigate } = this.props.navigation
         navigate("GridTutorial")
     }
@@ -174,7 +173,6 @@ class GridMemorization extends Component {
         const grid = this.generateGrid(4, 4)
         return (
             <Grid>
-                {/* <GridTutorial isVisible={this.state.showTutorial} onBackdropPress={this.closeTutorial} defaultColor={squareDefaultColor} flipColor={squareFlipColor} gridStyle={styles.grid}/> */}
                 <Row size={2}>
                     <Col size={1}></Col>
                     <Col size={5} style={{ justifyContent: "center", alignItems: "center" }}>
@@ -196,7 +194,7 @@ class GridMemorization extends Component {
                         <Col size={2}>
                             <Button
                                 title={this.state.gameControlButtonTitle}
-                                onPress={() => this.initiateGameControl()}
+                                onPress={async () => { await this.initiateGameControl()}}
                                 disabled={this.state.gameControlButtonStatus}
                             />
                         </Col>

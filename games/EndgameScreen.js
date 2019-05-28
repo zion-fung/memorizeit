@@ -1,35 +1,41 @@
-import React, { Component } from "react"
+import React, { memo } from "react"
 import { Overlay, Text, Button } from "react-native-elements"
-import { getStreak, getMaxStreak } from "../storage/storage"
 import { View } from "react-native"
+import Icon from "react-native-vector-icons/MaterialCommunityIcons"
 
-export default class EndgameScreen extends Component {
-    constructor(props) {
-        super(props)
-        this.state = {
-            currentStreak: 0,
-            maxStreak: 0
-        }
-    }
-    async componentDidMount() {
-        const streak = await getStreak(this.props.keyId)
-        const max = await getMaxStreak(this.props.keyId)
-        this.setState({ currentStreak: streak, maxStreak: max })
-    }
-    render() {
-        return (
-            <Overlay isVisible={this.props.isVisible} onBackdropPress={this.props.onBackdropPress}>
-                <View>
-                    <View style={{ alignItems: "flex-start" }}>
-                        <Button title="X" type="clear" onPress={this.props.onBackdropPress} />
-                    </View>
+function EndgameScreen({ isVisible, onBackdropPress, message, maxStreak, currentStreak }) {
+    return (
+        <Overlay isVisible={isVisible} onBackdropPress={onBackdropPress} height="40%">
+            <View>
+                <Button
+                    containerStyle={{ position: "absolute", right: -5, top: -5 }}
+                    icon={
+                        <Icon
+                            name="close-outline"
+                            size={30}
+                            color="red"
+                        />
+                    }
+                    type="clear" onPress={onBackdropPress}
+                />
+                <View style={{ flexDirection: "column", margin: 10, marginTop: 50 }}>
                     <View style={{ alignItems: "center" }}>
-                        <Text h3>{this.props.message}</Text>
-                        <Text h4>Longest streak: {this.state.maxStreak}</Text>
-                        <Text h4>Current streak: {this.state.currentStreak}</Text>
+                        <Text h3>{message}</Text>
+                    </View>
+                    <View style={{ flex: 1, flexDirection: "row", marginTop: 15, justifyContent: "center", alignSelf: "center" }}>
+                        <View style={{ flex: 4, alignItems: "flex-end" }}>
+                            <Text h4>longest streak:</Text>
+                            <Text h4>current streak:</Text>
+                        </View>
+                        <View style={{ flex: 1, alignItems: "flex-start", marginLeft: 10 }}>
+                            <Text h4>{maxStreak}</Text>
+                            <Text h4>{currentStreak}</Text>
+                        </View>
                     </View>
                 </View>
-            </Overlay>
-        )
-    }
+            </View>
+        </Overlay>
+    )
 }
+
+export default memo(EndgameScreen);

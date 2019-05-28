@@ -1,24 +1,34 @@
 import React, { Component } from "react";
 import { Text, StyleSheet } from "react-native";
 import { Grid, Row, Col } from "react-native-easy-grid";
-import { Button, Overlay } from "react-native-elements";
+import { Button } from "react-native-elements";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons"
-import { incrementStreak, resetStreak } from "../storage/storage"
+import { incrementStreak, resetStreak, getStreak, getMaxStreak } from "../storage/storage"
+import EndgameScreen from "./EndgameScreen"
+const prefs = require("../storage/prefs").prefs
 
 let timeout = null
-const squareDefaultColor = "#2089dc";
-const squareFlipColor = "red";
+const squareDefaultColor = prefs.grid.squareDefaultColor;
+const squareFlipColor = prefs.grid.squareFlipColor;
+const winMessage = prefs.grid.winMessage
+const loseMessage = prefs.grid.loseMessage
+const STORAGE_KEY = prefs.grid.STORAGE_KEY
+
 class GridMemorization extends Component {
     constructor(props) {
         super(props)
         this.state = {
             colorStates: this.generateColorStates(4, 4),
-            gameControlButtonTitle: "Start",
+            gameControlButtonTitle: prefs.grid.actionButtonDefault,
             gameIsActive: false,
             gameControlButtonStatus: false,
-            gameTitle: "Press Start!",
+            gameTitle: prefs.grid.gameTitleDefault,
             showTutorial: false,
-            canControlGame: true
+            canControlGame: true,
+            showEndgameScreen: false,
+            endgameMessage: "",
+            maxStreak: 0,
+            currentStreak: 0
         }
     }
     componentDidMount() {
@@ -98,7 +108,7 @@ class GridMemorization extends Component {
             colorStates: colorStates
         })
     }
-    async initiateGameControl() {
+    initiateGameControl = async () => {
         if(!this.state.canControlGame) {
             return
         }
@@ -106,9 +116,9 @@ class GridMemorization extends Component {
             // Game is not running
             // Set titles and buttons
             this.setState({
-                gameControlButtonTitle: "Check",
+                gameControlButtonTitle: prefs.grid.actionButtonSubmit,
                 gameIsActive: true,
-                gameTitle: "Memorize the pattern!",
+                gameTitle: prefs.grid.gameTitleMemorize,
                 canControlGame: false
             })
             // Generate random pattern
@@ -124,45 +134,52 @@ class GridMemorization extends Component {
                 this.setState({
                     colorStates: this.generateColorStates(4, 4),
                     // Tell user to enter pattern
-                    gameTitle: "Enter the pattern!",
+                    gameTitle: prefs.grid.gameTitleSubmission,
                     canControlGame: true
                 })
             }, 5000)
         } else {
             // Game is running
             this.setState({
-                gameControlButtonTitle: "Start",
+                gameControlButtonTitle: prefs.grid.actionButtonDefault,
                 gameIsActive: false
             })
             // Check user entered pattern against generated pattern
             let userStates = this.state.colorStates
             let correctStates = this.state.correctColorStates
+            let message = ""
             // Tell user if they're correct or not
             for (let r = 0; r < 4; r++) {
                 for (let c = 0; c < 4; c++) {
                     if (userStates[r][c] !== correctStates[r][c]) {
-                        alert("You got it wrong...\nMaybe next time!")
+                        // alert("You got it wrong...\nMaybe next time!")
+                        await resetStreak(STORAGE_KEY)
+                        const max = await getMaxStreak(STORAGE_KEY)
                         this.setState({
                             colorStates: this.generateColorStates(4, 4),
-                            gameTitle: "Press Start!"
+                            gameTitle: "Press Start!",
+                            showEndgameScreen: true,
+                            endgameMessage: loseMessage,
+                            currentStreak: 0,
+                            maxStreak: max
                         })
-                        await resetStreak(0)
                         return
                     }
                 }
             }
-            alert("You got it correct!")
+            // alert("You got it correct!")
+            await incrementStreak(STORAGE_KEY)
+            const streak = await getStreak(STORAGE_KEY)
+            const max = await getMaxStreak(STORAGE_KEY)
             this.setState({
                 colorStates: this.generateColorStates(4, 4),
-                gameTitle: "Press Start!"
+                gameTitle: prefs.grid.gameTitleDefault,
+                showEndgameScreen: true,
+                endgameMessage: winMessage,
+                currentStreak: streak,
+                maxStreak: max
             })
-            await incrementStreak(0)
         }
-    }
-    closeTutorial = () => {
-        this.setState({
-            showTutorial: false
-        })
     }
     openTutorial = () => {
         const { navigate } = this.props.navigation
@@ -173,6 +190,14 @@ class GridMemorization extends Component {
         const grid = this.generateGrid(4, 4)
         return (
             <Grid>
+                <EndgameScreen 
+                    isVisible={this.state.showEndgameScreen} 
+                    message={this.state.endgameMessage} 
+                    onBackdropPress={() => this.setState({showEndgameScreen: false})} 
+                    keyId={0}
+                    maxStreak={this.state.maxStreak}
+                    currentStreak={this.state.currentStreak}
+                />
                 <Row size={2}>
                     <Col size={1}></Col>
                     <Col size={5} style={{ justifyContent: "center", alignItems: "center" }}>
@@ -194,7 +219,7 @@ class GridMemorization extends Component {
                         <Col size={2}>
                             <Button
                                 title={this.state.gameControlButtonTitle}
-                                onPress={async () => { await this.initiateGameControl()}}
+                                onPress={this.initiateGameControl}
                                 disabled={this.state.gameControlButtonStatus}
                             />
                         </Col>

@@ -3,20 +3,33 @@ import { Grid, Row, Col } from "react-native-easy-grid";
 import { Text, Button, Overlay, Input, Header } from "react-native-elements";
 import quotes from "./assets/quotes.json"
 import Icon from "react-native-vector-icons/MaterialCommunityIcons"
-import { ScrollView, View } from "react-native"
+import { ScrollView, View, Alert, Animated } from "react-native"
+import EndgameScreen from "./EndgameScreen"
+import { incrementStreak, resetStreak, getStreak, getMaxStreak } from "../storage/storage"
+const prefs = require("../storage/prefs").prefs
+const winMessage = prefs.quotes.winMessage
+const loseMessage = prefs.quotes.loseMessage
+const STORAGE_KEY = prefs.quotes.STORAGE_KEY
 
 export default class Quotes extends Component {
     constructor(props) {
         super(props)
+        const animatedValue = new Animated.Value(0.99)
         this.state = {
-            gameTitle: "Press start!",
-            actionButtonTitle: "Start!",
+            gameTitle: prefs.quotes.gameTitleDefault,
+            actionButtonTitle: prefs.quotes.actionButtonDefault,
             showAnswerOverlay: false,
             gameIsActive: false,
             userText: "",
             userAuthor: "",
             tempAuthor: "",
-            quoteLength: quotes.length
+            quoteLength: quotes.length,
+            showEndgameScreen: false,
+            endgameMessage: "",
+            maxStreak: 0,
+            currentStreak: 0,
+            tryNumber: 1,
+            fadeAnim: animatedValue
         }
     }
     componentDidMount() {
@@ -37,31 +50,48 @@ export default class Quotes extends Component {
                 onPress={(navigation.getParam("openTutorial"))}
                 type="clear"
             />,
-            headerTintColor: "white",
-            headerStyle: { backgroundColor: "#2089dc" },
+            headerTintColor: prefs.quotes.headerTintColor,
+            headerStyle: { backgroundColor: prefs.quotes.headerColor },
             headerTitle: "Quotes"
         }
     }
-    checkAnswers() {
+    checkAnswers = async () => {
+        this.setState({
+            tryNumber: this.state.tryNumber + 1
+        })
         let correctText = this.state.quoteText.toLocaleLowerCase()
         let correctAuthor = this.state.tempAuthor.toLocaleLowerCase()
         let userText = this.state.userText.toLocaleLowerCase()
         let userAuthor = this.state.userAuthor.toLocaleLowerCase()
-        if (correctText === userText && correctAuthor === userAuthor) {
-            alert("You were correct!")
-            this.setState({
-                showAnswerOverlay: false,
-                gameIsActive: false,
-                userText: "",
-                userAuthor: "",
-                gameTitle: "Press start!",
-                actionButtonTitle: "Start!",
-                quoteText: "",
-                quoteAuthor: ""
-            })
-            return
+        let message = winMessage
+        if (correctText !== userText || correctAuthor !== userAuthor) {
+            message = loseMessage
+            if(this.state.tryNumber < 3) {
+                Alert.alert("", `You were wrong... Try again!\nTries left: ${3 - this.state.tryNumber}`)
+                return
+            }
+            await resetStreak(STORAGE_KEY)
         }
-        alert("You were wrong...\nTry again!")
+        if(message === winMessage) {
+            await incrementStreak(STORAGE_KEY)
+        }
+        const streak = await getStreak(STORAGE_KEY)
+        const max = await getMaxStreak(STORAGE_KEY)
+        this.setState({
+            showAnswerOverlay: false,
+            gameIsActive: false,
+            userText: "",
+            userAuthor: "",
+            gameTitle: prefs.quotes.gameTitleDefault,
+            actionButtonTitle: prefs.quotes.actionButtonDefault,
+            quoteText: "",
+            quoteAuthor: "",
+            showEndgameScreen: true,
+            endgameMessage: message,
+            currentStreak: streak,
+            maxStreak: max
+        })
+        
     }
     actionButton() {
         if (!this.state.gameIsActive) {
@@ -74,13 +104,24 @@ export default class Quotes extends Component {
                 authorWords = quotes[random].quoteAuthor.split(" ").length
             }
             this.setState({
-                actionButtonTitle: "Check",
-                gameTitle: "Memorize as fast as you can!",
+                actionButtonTitle: prefs.quotes.actionButtonSubmit,
+                gameTitle: prefs.quotes.gameTitleMemorize,
                 gameIsActive: true,
                 quoteText: quotes[random].quoteText,
                 quoteAuthor: quotes[random].quoteAuthor,
-                tempAuthor: quotes[random].quoteAuthor
+                tempAuthor: quotes[random].quoteAuthor,
+                tryNumber: 1
             })
+            console.log("quote:", quotes[random]);
+            let time = Animated.timing(
+                this.state.fadeAnim,
+                {
+                    toValue: 0,
+                    duration: prefs.quotes.timeLimit,
+                    useNativeDriver: true
+                }
+            ).start()
+            console.log("time:", time);
         } else {
             this.setState({
                 showAnswerOverlay: true,
@@ -100,6 +141,14 @@ export default class Quotes extends Component {
     render() {
         return (
             <Grid>
+                <EndgameScreen 
+                    isVisible={this.state.showEndgameScreen} 
+                    message={this.state.endgameMessage} 
+                    onBackdropPress={() => this.setState({showEndgameScreen: false})} 
+                    keyId={0}
+                    maxStreak={this.state.maxStreak}
+                    currentStreak={this.state.currentStreak}
+                />
                 <Overlay isVisible={this.state.showAnswerOverlay} onBackdropPress={this.clearOverlay} height="90%" width="90%" windowBackgroundColor="rgba(0, 0, 0, 0.8)"
                 >
                     <ScrollView>
@@ -107,13 +156,13 @@ export default class Quotes extends Component {
                             leftComponent={
                                 <Icon
                                     name="arrow-left"
-                                    color="black"
+                                    color="white"
                                     size={30}
                                     onPress={this.clearOverlay}
                                 />
                             }
                             centerComponent={
-                                <Text h4 style={{ color: "black" }}>Quote Memory</Text>
+                                <Text h4 style={{ color: "white" }}>Quote Memory</Text>
                             }
                         />
                         <View style={{ height: 25 }}></View>
@@ -133,7 +182,7 @@ export default class Quotes extends Component {
                         <Button
                             style={{ marginTop: 15, marginBottom: 15 }}
                             title="Check"
-                            onPress={() => this.checkAnswers()}
+                            onPress={this.checkAnswers}
                         ></Button>
                     </ScrollView>
                 </Overlay>
@@ -144,15 +193,21 @@ export default class Quotes extends Component {
                     <Col size={1}></Col>
                     <Col size={10} style={{ backgroundColor: "lightblue", borderColor: "black", borderWidth: 3 }}>
                         <Row size={8}>
-                            <Text h3 style={{ margin: 15 }}>{this.state.quoteText}</Text>
+                            <Animated.View style={{ opacity: this.state.fadeAnim, margin: 15 }}>
+                                <Text h3>{this.state.quoteText}</Text>
+                            </Animated.View>
                         </Row>
                         <Row size={1} style={{ paddingBottom: 10 }}>
-                            <Text h3 style={{ position: "absolute", right: 0, marginRight: 10, marginBottom: 10 }}>- {this.state.quoteAuthor}</Text>
+                            <Animated.View style={{ opacity: this.state.fadeAnim, position: "absolute", right: 0, marginRight: 10, marginBottom: 10}}>
+                                <Text h3>- {this.state.quoteAuthor}</Text>
+                            </Animated.View>
                         </Row>
                     </Col>
                     <Col size={1}></Col>
                 </Row>
-                <Row size={1}></Row>
+                <Row size={1} style={{ justifyContent: "center", alignItems: "center" }}>
+                    <Text h4>tries left: {4 - this.state.tryNumber}</Text>
+                </Row>
                 <Row size={1}>
                     <Col size={1}></Col>
                     <Col size={5}>

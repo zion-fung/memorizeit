@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { ScrollView, View, StyleSheet } from "react-native";
 import { Text, Button } from "react-native-elements";
+const prefs = require("../../storage/prefs").prefs.quotes
 
 export default class QuotesTutorial extends Component {
     static navigationOptions = {
@@ -32,8 +33,8 @@ export default class QuotesTutorial extends Component {
                 </View>
                 <View>
                     <Text h3 style={styles.space}>How to play:</Text>
-                    <Text style={styles.space}>Press the start button to start the game. When the game is running, the button title changes to "Check". Once the game starts, memorize the quote and author as fast as you can (punctuation matters, but case does not).</Text>
-                    <Text style={styles.space}>Once you have the quote and author memorized, press the check button to see if you are correct. Enter the quote body in "quote text" and the author in "quote author". Press the "Check" button to see if you are correct. A popup will appear telling you if you are correct or not.</Text>
+                    <Text style={styles.space}>Press the start button to start the game. When the game is running, the button title changes to "Check". Once the game starts, memorize the quote and author before it fades away (punctuation matters, but case does not). The quote will fade over {prefs.timeLimit / 60000} minutes.</Text>
+                    <Text style={styles.space}>Once you have the quote and author memorized, press the check button to see if you are correct. Enter the quote body in "quote text" and the author in "quote author". Press the "Check" button to see if you are correct. A popup will appear telling you if you are correct or not. You have 3 tries to get it correct.</Text>
                 </View>
             </ScrollView>
         )

@@ -1,6 +1,7 @@
 import React, { Component } from "react"
 import { View, ScrollView, StyleSheet } from "react-native";
 import { Text, Button } from "react-native-elements";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons"
 
 export default class PicturesTutorial extends Component {
     static navigationOptions = {
@@ -25,6 +26,15 @@ export default class PicturesTutorial extends Component {
                 <View style={{ marginTop: 15, marginLeft: 35, marginRight: 35 }}>
                     <Text style={styles.space}>Click this button to check your answer (same button):</Text>
                     <Button title="Check" onPress={() => { }} />
+                </View>
+                <View style={{ marginTop: 15 }}>
+                    <Text h4>These are the 4 possible emoticons:</Text>
+                </View>
+                <View style={{ marginTop: 5, flexDirection: "row", justifyContent: "center" }}>
+                    <Icon name="emoticon-happy-outline" size={60} color="black" />
+                    <Icon name="emoticon-neutral-outline" size={60} color="black" />
+                    <Icon name="emoticon-sad-outline" size={60} color="black" />
+                    <Icon name="emoticon-wink-outline" size={60} color="black" />
                 </View>
                 <View>
                     <Text h3 style={styles.space}>How to play:</Text>

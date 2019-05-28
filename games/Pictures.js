@@ -1,11 +1,18 @@
 import React, { Component } from "react";
 import { View } from "react-native";
 import { Grid, Row, Col } from "react-native-easy-grid";
-import { Text, Overlay, Button, Header, Divider } from "react-native-elements";
+import { Text, Overlay, Button, Header } from "react-native-elements";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons"
+import EndgameScreen from "./EndgameScreen"
+import { incrementStreak, resetStreak, getStreak, getMaxStreak } from "../storage/storage"
 
+const prefs = require("../storage/prefs").prefs
 const emoticons = ["emoticon-happy-outline", "emoticon-neutral-outline", "emoticon-sad-outline", "emoticon-wink-outline"]
 let timeout = null
+const winMessage = prefs.pictures.winMessage
+const loseMessage = prefs.pictures.loseMessage
+const STORAGE_KEY = prefs.pictures.STORAGE_KEY
+
 export default class Pictures extends Component {
     constructor(props) {
         super(props)
@@ -13,10 +20,14 @@ export default class Pictures extends Component {
             userInput: [],
             displayEmoticon: "",
             gameIsActive: false,
-            gameTitle: "Press start!",
+            gameTitle: prefs.pictures.gameTitleDefault,
             solution: [],
             showAnswerOverlay: false,
-            actionButtonTitle: "Start"
+            actionButtonTitle: prefs.pictures.actionButtonDefault,
+            showEndgameScreen: false,
+            endgameMessage: "",
+            maxStreak: 0,
+            currentStreak: 0
         }
     }
     componentWillUnmount() {
@@ -40,8 +51,8 @@ export default class Pictures extends Component {
                 onPress={(navigation.getParam("openTutorial"))}
                 type="clear"
             />,
-            headerTintColor: "white",
-            headerStyle: { backgroundColor: "#2089dc" },
+            headerTintColor: prefs.pictures.headerTintColor,
+            headerStyle: { backgroundColor: prefs.pictures.headerColor },
             headerTitle: "Pictures"
         }
     }
@@ -69,10 +80,10 @@ export default class Pictures extends Component {
     startGame() {
         if (!this.state.gameIsActive) {
             this.setState({
-                gameTitle: "Memorize!",
+                gameTitle: prefs.pictures.gameTitleMemorize,
                 gameIsActive: true,
                 displayEmoticon: "",
-                actionButtonTitle: "Check"
+                actionButtonTitle: prefs.pictures.actionButtonSubmit
             })
             let solution = []
             for (let i = 0; i < 5; i++) {
@@ -100,42 +111,54 @@ export default class Pictures extends Component {
                         timeout = setTimeout(run)
                     } else {
                         that.setState({
-                            gameTitle: "Enter the sequence!"
+                            gameTitle: prefs.pictures.gameTitleSubmission
                         })
                     }
                 }, 600)
-            }, 500)
+            }, 1000)
         } else {
             this.setState({
                 showAnswerOverlay: true
             })
         }
     }
-    submitUserInput() {
+    submitUserInput = async () => {
         if (this.state.gameIsActive) {
             // console.log(this.state.userInput)
             // Check userInput against solution
             let userInput = this.state.userInput
             let solution = this.state.solution
+            let message = winMessage
             if (userInput.length !== solution.length) {
-                alert("You were incorrect...\nTry again!")
-                return
-            }
-            for (let i = 0; i < userInput.length; i++) {
-                if (userInput[i].props.name !== solution[i]) {
-                    alert("You were incorrect...\nTry again!")
-                    return
+                message = loseMessage
+                await resetStreak(STORAGE_KEY)
+            } else {
+                for (let i = 0; i < userInput.length; i++) {
+                    if (userInput[i].props.name !== solution[i]) {
+                        message = loseMessage
+                        await resetStreak(STORAGE_KEY)
+                        break
+                    }
                 }
             }
-            alert("You were correct! Congratulations!")
+            if(message === winMessage) {
+                await incrementStreak(STORAGE_KEY)
+            }
+            const streak = await getStreak(STORAGE_KEY)
+            const max = await getMaxStreak(STORAGE_KEY)
             this.setState({
-                gameTitle: "Press start!",
+                gameTitle: prefs.pictures.gameTitleDefault,
                 gameIsActive: false,
                 displayEmoticon: "",
                 userInput: [],
                 showAnswerOverlay: false,
-                actionButtonTitle: "Start"
+                actionButtonTitle: prefs.pictures.actionButtonDefault,
+                showEndgameScreen: true,
+                endgameMessage: message,
+                currentStreak: streak,
+                maxStreak: max
             })
+            
         }
     }
     clearOverlay() {
@@ -147,6 +170,14 @@ export default class Pictures extends Component {
     render() {
         return (
             <Grid>
+                <EndgameScreen 
+                    isVisible={this.state.showEndgameScreen} 
+                    message={this.state.endgameMessage} 
+                    onBackdropPress={() => this.setState({showEndgameScreen: false})} 
+                    keyId={0}
+                    maxStreak={this.state.maxStreak}
+                    currentStreak={this.state.currentStreak}
+                />
                 <Overlay isVisible={this.state.showAnswerOverlay} onBackdropPress={() => this.clearOverlay()} height="90%" width="90%">
                     <Grid>
                         <Header
@@ -162,7 +193,7 @@ export default class Pictures extends Component {
                                 <Text h4 style={{ color: "white" }}>Submit Answer</Text>
                             }
                         />
-                        <Row size={3} style={{ paddingTop: 10, paddingRight: 10, paddingLeft: 10, paddingBottom: 15, flexWrap: "wrap", borderColor: "gray", borderWidth: 2, margin: 10 }} >
+                        <Row size={3} style={{ paddingTop: 10, paddingRight: 10, paddingLeft: 15, paddingBottom: 15, flexWrap: "wrap", borderColor: "gray", borderWidth: 2, margin: 10 }} >
                             {this.state.userInput}
                         </Row>
                         <Row size={1}>
@@ -178,7 +209,7 @@ export default class Pictures extends Component {
                                 <Button
                                     title="Submit"
                                     buttonStyle={{ backgroundColor: "green" }}
-                                    onPress={() => this.submitUserInput()}
+                                    onPress={this.submitUserInput}
                                 />
                             </Col>
                         </Row>

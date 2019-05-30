@@ -11,7 +11,11 @@ export const prefs = {
         headerTintColor: "white",
         squareDefaultColor: "#2089dc",
         squareFlipColor: "red",
-        STORAGE_KEY: 0
+        STORAGE_KEY: 0,
+        timeLimit: 5000, // Starting time limit
+        minTimeLimit: 1000, // Smallest time limit possible
+        difficultyInterval: 5, // Every x correct games, the difficulty goes up
+        difficultyStep: 250 // Time reduces by x every interval
     },
     pictures: {
         winMessage: "You were right!",

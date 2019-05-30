@@ -13,3 +13,4 @@ Written entirely in React Native
 
 ### Sources
 - Quotes are from [here](https://github.com/JamesFT/Database-Quotes-JSON)
+- All icons used are from the [community material design icons](https://materialdesignicons.com/)

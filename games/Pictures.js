@@ -5,13 +5,18 @@ import { Text, Overlay, Button, Header } from "react-native-elements";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons"
 import EndgameScreen from "./EndgameScreen"
 import { incrementStreak, resetStreak, getStreak, getMaxStreak } from "../storage/storage"
+import { picturesDifficulty } from "./difficulty/difficulty"
 
+// Get preferences
 const prefs = require("../storage/prefs").prefs
 const emoticons = ["emoticon-happy-outline", "emoticon-neutral-outline", "emoticon-sad-outline", "emoticon-wink-outline"]
 let timeout = null
 const winMessage = prefs.pictures.winMessage
 const loseMessage = prefs.pictures.loseMessage
 const STORAGE_KEY = prefs.pictures.STORAGE_KEY
+let pictureExistence = prefs.pictures.pictureExistence
+let pictureInterval = prefs.pictures.pictureInterval
+let sequenceDelay = prefs.pictures.sequenceDelay
 
 export default class Pictures extends Component {
     constructor(props) {
@@ -57,9 +62,6 @@ export default class Pictures extends Component {
         }
     }
     addUserEmoticon(index) {
-        // if (!this.state.gameIsActive) {
-        //     return
-        // }
         let userInput = this.state.userInput
         const length = userInput.length
         if (length == 12) {
@@ -77,34 +79,51 @@ export default class Pictures extends Component {
             userInput: userInput
         })
     }
-    startGame() {
+    startGame = async () => {
         if (!this.state.gameIsActive) {
-            this.setState({
-                gameTitle: prefs.pictures.gameTitleMemorize,
-                gameIsActive: true,
-                displayEmoticon: "",
-                actionButtonTitle: prefs.pictures.actionButtonSubmit
-            })
+            // Change delays based on current streak
+            const currentStreak = await getStreak(STORAGE_KEY)
+            const difficulty = picturesDifficulty(currentStreak)
+            pictureExistence = difficulty.existence
+            pictureInterval = difficulty.interval
+            console.log("New delay times:", difficulty);
+
+            //  Randomly generate solution (currently only 5 in length)
             let solution = []
             for (let i = 0; i < 5; i++) {
                 let random = Math.floor(Math.random() * 4)
                 solution.push(emoticons[random])
             }
+
+            // Log solution for debugging
             console.log("solution:", solution)
+
+            // Set state variables to game start
             this.setState({
+                gameTitle: prefs.pictures.gameTitleMemorize,
+                gameIsActive: true,
+                displayEmoticon: "",
+                actionButtonTitle: prefs.pictures.actionButtonSubmit,
                 solution: solution
             })
+
+            // Flash series of 5 emoticons to user based on time intervals
             i = 0
+            // Removes need to bind this
             let that = this
+            // Wait for sequence to start
             timeout = setTimeout(function run() {
+                // Set emoticon
                 that.setState({
                     displayEmoticon: solution[i]
                 })
+                // Set display to blank
                 timeout = setTimeout(() => {
                     that.setState({
                         displayEmoticon: ""
                     })
-                }, 450)
+                }, pictureExistence)
+                // Restart 
                 timeout = setTimeout(() => {
                     i += 1
                     if (i < 5) {
@@ -114,8 +133,8 @@ export default class Pictures extends Component {
                             gameTitle: prefs.pictures.gameTitleSubmission
                         })
                     }
-                }, 600)
-            }, 1000)
+                }, pictureExistence + pictureInterval)
+            }, sequenceDelay)
         } else {
             this.setState({
                 showAnswerOverlay: true
@@ -274,7 +293,7 @@ export default class Pictures extends Component {
                 <Row size={1}>
                     <Col size={1}></Col>
                     <Col size={5}>
-                        <Button title={this.state.actionButtonTitle} onPress={() => this.startGame()} />
+                        <Button title={this.state.actionButtonTitle} onPress={this.startGame} />
                     </Col>
                     <Col size={1}></Col>
                 </Row>

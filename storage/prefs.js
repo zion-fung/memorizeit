@@ -13,9 +13,9 @@ export const prefs = {
         squareFlipColor: "red",
         STORAGE_KEY: 0,
         timeLimit: 5000, // Starting time limit
-        minTimeLimit: 1000, // Smallest time limit possible
-        difficultyInterval: 5, // Every x correct games, the difficulty goes up
-        difficultyStep: 250 // Time reduces by x every interval
+        minTimeLimit: 800, // Smallest time limit possible
+        difficultyInterval: 2, // Every x correct games, the difficulty goes up
+        difficultyStep: 300 // Time reduces by x every interval
     },
     pictures: {
         winMessage: "You were right!",
@@ -29,7 +29,17 @@ export const prefs = {
         headerTintColor: "white",
         squareDefaultColor: "",
         squareFlipColor: "",
-        STORAGE_KEY: 1
+        STORAGE_KEY: 1,
+        sequenceDelay: 1000, // ms before sequence begins
+        pictureExistence: 450, // ms that the picture stays up
+        pictureInterval: 150, // ms between picture dissapearence and appearence
+        difficulty: {
+            changeInterval: 2, // Every x correct games, the difficulty goes up
+            existenceStep: 15, // pictureExistence decreases by x every interval
+            intervalStep: 5, // pictureInterval decreases by x every interval
+            minExistence: 225, // lowest value for pictureExistence
+            minInterval: 75 // lowest value for pictureInterval
+        }
     },
     quotes: {
         winMessage: "You were right!",
@@ -43,7 +53,12 @@ export const prefs = {
         headerTintColor: "white",
         squareDefaultColor: "",
         squareFlipColor: "",
-        timeLimit: 300000,
-        STORAGE_KEY: 2
+        timeLimit: 120000, // time in ms before quote fades
+        STORAGE_KEY: 1,
+        difficulty: {
+            minTimeLimit: 45000, // min time in ms user can have
+            interval: 2, // every x correct games, the time shortens
+            step: 80000 // how many ms timeLimit decreases every interval
+        }
     },
 }

@@ -6,7 +6,7 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons"
 import { incrementStreak, resetStreak, getStreak, getMaxStreak } from "../storage/storage"
 import EndgameScreen from "./EndgameScreen"
 const prefs = require("../storage/prefs").prefs
-import { gridTimeLimit } from "./difficulty/difficulty"
+import { gridDifficulty } from "./difficulty/difficulty"
 
 let timeout = null
 const squareDefaultColor = prefs.grid.squareDefaultColor;
@@ -116,7 +116,7 @@ class GridMemorization extends Component {
         }
         if (!this.state.gameIsActive) {
             const currentStreak = await getStreak(STORAGE_KEY)
-            timeLimit = gridTimeLimit(currentStreak)
+            timeLimit = gridDifficulty(currentStreak)
             // Game is not running
             // Set titles and buttons
             this.setState({

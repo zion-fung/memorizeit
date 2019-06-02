@@ -6,10 +6,13 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons"
 import { ScrollView, View, Alert, Animated } from "react-native"
 import EndgameScreen from "./EndgameScreen"
 import { incrementStreak, resetStreak, getStreak, getMaxStreak } from "../storage/storage"
+import { quotesDifficulty } from "./difficulty/difficulty"
+
 const prefs = require("../storage/prefs").prefs
 const winMessage = prefs.quotes.winMessage
 const loseMessage = prefs.quotes.loseMessage
 const STORAGE_KEY = prefs.quotes.STORAGE_KEY
+let timeLimit = prefs.quotes.timeLimit;
 
 export default class Quotes extends Component {
     constructor(props) {
@@ -93,16 +96,23 @@ export default class Quotes extends Component {
         })
         
     }
-    actionButton() {
+    actionButton = async () => {
         if (!this.state.gameIsActive) {
+            const currentStreak = await getStreak(STORAGE_KEY)
+            timeLimit = quotesDifficulty(currentStreak)
+            // Get random quote
             let random = Math.floor(Math.random() * this.state.quoteLength)
             let words = quotes[random].quoteText.split(" ").length
             let authorWords = quotes[random].quoteAuthor.split(" ").length
+
+            // Discard quotes that are longer than 10 words, have no author or an author with more than 2 words
             while (words > 10 || quotes[random].quoteAuthor === "" || authorWords > 2) {
                 random = Math.floor(Math.random() * this.state.quoteLength)
                 words = quotes[random].quoteText.split(" ").length
                 authorWords = quotes[random].quoteAuthor.split(" ").length
             }
+
+            // update state variables
             this.setState({
                 actionButtonTitle: prefs.quotes.actionButtonSubmit,
                 gameTitle: prefs.quotes.gameTitleMemorize,
@@ -113,15 +123,15 @@ export default class Quotes extends Component {
                 tryNumber: 1
             })
             console.log("quote:", quotes[random]);
-            let time = Animated.timing(
+            Animated.timing(
                 this.state.fadeAnim,
                 {
                     toValue: 0,
-                    duration: prefs.quotes.timeLimit,
+                    duration: timeLimit,
                     useNativeDriver: true
                 }
             ).start()
-            console.log("time:", time);
+            console.log("time:", timeLimit);
         } else {
             this.setState({
                 showAnswerOverlay: true,
@@ -213,7 +223,7 @@ export default class Quotes extends Component {
                     <Col size={5}>
                         <Button
                             title={this.state.actionButtonTitle}
-                            onPress={() => this.actionButton()}
+                            onPress={this.actionButton}
                         />
                     </Col>
                     <Col size={1}></Col>

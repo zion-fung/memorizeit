@@ -14,3 +14,12 @@ Written entirely in React Native
 ### Sources
 - Quotes are from [here](https://github.com/JamesFT/Database-Quotes-JSON)
 - All icons used are from the [community material design icons](https://materialdesignicons.com/)
+
+### TODO
+- Move all variables to prefs file
+- Add increasing difficulty based on times
+  - General game difficuly rule? (Easy, Medium, Hard...)
+- Add additional "how to play" section on main screen
+- Improve game on lower resolutions (720p, etc.)
+- Global leaderboards
+- Add more games

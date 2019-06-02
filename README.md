@@ -1,6 +1,7 @@
 # Memorize It
 A simple set of fast paced games that test your memory.
 Written entirely in React Native
+Get the game [here](https://play.google.com/store/apps/details?id=com.memorizeit)
 
 ## Packages Used
 - `react-native-elements` and `react-native-vector-icons`: Main UI library used

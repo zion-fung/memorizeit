@@ -21,7 +21,6 @@ export const prefs = {
         winMessage: "You were right!",
         loseMessage: "You were wrong...",
         actionButtonDefault: "Start",
-        actionButtonSubmit: "Check",
         gameTitleDefault: "Press Start!",
         gameTitleMemorize: "Memorize the sequence!",
         gameTitleSubmission: "Enter the sequence!",
@@ -58,7 +57,7 @@ export const prefs = {
         difficulty: {
             minTimeLimit: 45000, // min time in ms user can have
             interval: 2, // every x correct games, the time shortens
-            step: 80000 // how many ms timeLimit decreases every interval
+            step: 5000 // how many ms timeLimit decreases every interval
         }
     },
 }

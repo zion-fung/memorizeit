@@ -21,7 +21,7 @@ Get the game [here](https://play.google.com/store/apps/details?id=com.memorizeit
 ### TODO
 - Move all variables to prefs file
 - Add increasing difficulty based on times
-  - General game difficuly rule? (Easy, Medium, Hard...)
+  - General game difficulty rule? (Easy, Medium, Hard...)
 - Add additional "how to play" section on main screen
 - Improve game on lower resolutions (720p, etc.)
 - Global leaderboards

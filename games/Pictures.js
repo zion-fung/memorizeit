@@ -22,7 +22,9 @@ export default class Pictures extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            userInput: [],
+            userInputColors: ["white", "white", "white", "white", "white"],
+            userInputEmoticons: ["emoticon-happy-outline", "emoticon-happy-outline", "emoticon-happy-outline", "emoticon-happy-outline", "emoticon-happy-outline"],
+            userInputIndex: 0,
             displayEmoticon: "",
             gameIsActive: false,
             gameTitle: prefs.pictures.gameTitleDefault,
@@ -62,21 +64,31 @@ export default class Pictures extends Component {
         }
     }
     addUserEmoticon(index) {
-        let userInput = this.state.userInput
-        const length = userInput.length
-        if (length == 12) {
-            return
+        if (this.state.userInputIndex === this.state.solution.length) { 
+            return;
         }
-        userInput.push(
-            <Icon
-                key={length.toString()}
-                name={emoticons[index]}
-                size={50}
-                color="black"
-            />
-        )
+        let colors = this.state.userInputColors;
+        let emots = this.state.userInputEmoticons
+        colors[this.state.userInputIndex] = "black";
+        emots[this.state.userInputIndex] = emoticons[index];
         this.setState({
-            userInput: userInput
+            userInputIndex: this.state.userInputIndex + 1,
+            userInputColors: colors,
+            userInputEmoticons: emots
+        })
+    }
+    clearLastUserInput = () => {
+        if (this.state.userInputIndex === 0) {
+            return;
+        }
+        let colors = this.state.userInputColors;
+        let emots = this.state.userInputEmoticons;
+        colors[this.state.userInputIndex - 1] = "white";
+        emots[this.state.userInputIndex - 1] = "emoticon-happy-outline";
+        this.setState({
+            userInputIndex: this.state.userInputIndex - 1,
+            userInputColors: colors,
+            userInputEmoticons: emots
         })
     }
     startGame = async () => {
@@ -103,7 +115,6 @@ export default class Pictures extends Component {
                 gameTitle: prefs.pictures.gameTitleMemorize,
                 gameIsActive: true,
                 displayEmoticon: "",
-                actionButtonTitle: prefs.pictures.actionButtonSubmit,
                 solution: solution
             })
 
@@ -129,31 +140,29 @@ export default class Pictures extends Component {
                     if (i < 5) {
                         timeout = setTimeout(run)
                     } else {
+                        // Run after flashing the entire sequence
                         that.setState({
-                            gameTitle: prefs.pictures.gameTitleSubmission
+                            gameTitle: prefs.pictures.gameTitleSubmission,
+                            showAnswerOverlay: true
                         })
                     }
                 }, pictureExistence + pictureInterval)
             }, sequenceDelay)
-        } else {
-            this.setState({
-                showAnswerOverlay: true
-            })
         }
     }
     submitUserInput = async () => {
         if (this.state.gameIsActive) {
             // console.log(this.state.userInput)
             // Check userInput against solution
-            let userInput = this.state.userInput
+            let userInput = this.state.userInputEmoticons
             let solution = this.state.solution
             let message = winMessage
-            if (userInput.length !== solution.length) {
+            if (this.state.userInputIndex !== solution.length) {
                 message = loseMessage
                 await resetStreak(STORAGE_KEY)
             } else {
                 for (let i = 0; i < userInput.length; i++) {
-                    if (userInput[i].props.name !== solution[i]) {
+                    if (userInput[i] !== solution[i]) {
                         message = loseMessage
                         await resetStreak(STORAGE_KEY)
                         break
@@ -169,7 +178,9 @@ export default class Pictures extends Component {
                 gameTitle: prefs.pictures.gameTitleDefault,
                 gameIsActive: false,
                 displayEmoticon: "",
-                userInput: [],
+                userInputColors: ["white", "white", "white", "white", "white"],
+                userInputEmoticons: ["emoticon-happy-outline", "emoticon-happy-outline", "emoticon-happy-outline", "emoticon-happy-outline", "emoticon-happy-outline"],
+                userInputIndex: 0,
                 showAnswerOverlay: false,
                 actionButtonTitle: prefs.pictures.actionButtonDefault,
                 showEndgameScreen: true,
@@ -179,12 +190,6 @@ export default class Pictures extends Component {
             })
             
         }
-    }
-    clearOverlay() {
-        this.setState({
-            showAnswerOverlay: false,
-            userInput: []
-        })
     }
     render() {
         return (
@@ -197,30 +202,54 @@ export default class Pictures extends Component {
                     maxStreak={this.state.maxStreak}
                     currentStreak={this.state.currentStreak}
                 />
-                <Overlay isVisible={this.state.showAnswerOverlay} onBackdropPress={() => this.clearOverlay()} height="90%" width="90%">
-                    <Grid>
-                        <Header
-                            leftComponent={
-                                <Icon
-                                    name="arrow-left"
-                                    color="white"
-                                    size={30}
-                                    onPress={() => this.clearOverlay()}
-                                />
-                            }
-                            centerComponent={
-                                <Text h4 style={{ color: "white" }}>Submit Answer</Text>
-                            }
-                        />
-                        <Row size={3} style={{ paddingTop: 10, paddingRight: 10, paddingLeft: 15, paddingBottom: 15, flexWrap: "wrap", borderColor: "gray", borderWidth: 2, margin: 10 }} >
-                            {this.state.userInput}
+                    <Grid style={ this.state.showAnswerOverlay ? { display: 'flex' } : {display : 'none'} }>
+                        <Row size={1} style={{ alignItems: "center", justifyContent: "center" }}>
+                            <Text h3>Enter the patten!</Text>
                         </Row>
+                        <Row size={1}>
+                            <Col size={1} style={{ justifyContent: "center", alignItems: "center", borderBottomColor: "black", borderBottomWidth: 2, margin: 5 }}>
+                                <Icon
+                                    name={this.state.userInputEmoticons[0]}
+                                    size={50}
+                                    color={this.state.userInputColors[0]}
+                                />
+                            </Col>
+                            <Col size={1} style={{ justifyContent: "center", alignItems: "center", borderBottomColor: "black", borderBottomWidth: 2, margin: 5 }}>
+                                <Icon
+                                    name={this.state.userInputEmoticons[1]}
+                                    size={50}
+                                    color={this.state.userInputColors[1]}
+                                />
+                            </Col>
+                            <Col size={1} style={{ justifyContent: "center", alignItems: "center", borderBottomColor: "black", borderBottomWidth: 2, margin: 5 }}>
+                                <Icon
+                                    name={this.state.userInputEmoticons[2]}
+                                    size={50}
+                                    color={this.state.userInputColors[2]}
+                                />
+                            </Col>
+                            <Col size={1} style={{ justifyContent: "center", alignItems: "center", borderBottomColor: "black", borderBottomWidth: 2, margin: 5 }}>
+                                <Icon
+                                    name={this.state.userInputEmoticons[3]}
+                                    size={50}
+                                    color={this.state.userInputColors[3]}
+                                />
+                            </Col>
+                            <Col size={1} style={{ justifyContent: "center", alignItems: "center", borderBottomColor: "black", borderBottomWidth: 2, margin: 5 }}>
+                                <Icon
+                                    name={this.state.userInputEmoticons[4]}
+                                    size={50}
+                                    color={this.state.userInputColors[4]}
+                                />
+                            </Col>
+                        </Row>
+                        <Row size={2}></Row>
                         <Row size={1}>
                             <Col size={4}>
                                 <Button
                                     title="Clear"
                                     buttonStyle={{ backgroundColor: "red" }}
-                                    onPress={() => this.setState({ userInput: [] })}
+                                    onPress={this.clearLastUserInput}
                                 />
                             </Col>
                             <Col size={1}></Col>
@@ -274,29 +303,30 @@ export default class Pictures extends Component {
                             </Col>
                         </Row>
                     </Grid>
-                </Overlay>
-                <Row size={1} style={{ alignItems: "center", justifyContent: "center" }}>
-                    <Text h3>{this.state.gameTitle}</Text>
-                </Row>
-                <Row size={3}>
-                    <Col size={1}></Col>
-                    <Col size={5} style={{ borderColor: "black", borderWidth: 3, backgroundColor: "lightblue", justifyContent: "center", alignItems: "center" }}>
-                        {this.state.displayEmoticon === "" ? <View></View> : <Icon
-                            color="black"
-                            name={this.state.displayEmoticon}
-                            size={150}
-                        />}
-                    </Col>
-                    <Col size={1}></Col>
-                </Row>
-                <Row size={1}></Row>
-                <Row size={1}>
-                    <Col size={1}></Col>
-                    <Col size={5}>
-                        <Button title={this.state.actionButtonTitle} onPress={this.startGame} />
-                    </Col>
-                    <Col size={1}></Col>
-                </Row>
+                <Grid style={ this.state.showAnswerOverlay ? { display: 'none' } : {display : 'flex'} }>
+                    <Row size={1} style={{ alignItems: "center", justifyContent: "center" }}>
+                        <Text h3>{this.state.gameTitle}</Text>
+                    </Row>
+                    <Row size={3}>
+                        <Col size={1}></Col>
+                        <Col size={5} style={{ borderColor: "black", borderWidth: 3, backgroundColor: "lightblue", justifyContent: "center", alignItems: "center" }}>
+                            {this.state.displayEmoticon === "" ? <View></View> : <Icon
+                                color="black"
+                                name={this.state.displayEmoticon}
+                                size={150}
+                            />}
+                        </Col>
+                        <Col size={1}></Col>
+                    </Row>
+                    <Row size={1}></Row>
+                    <Row size={1}>
+                        <Col size={1}></Col>
+                        <Col size={5}>
+                            <Button title={this.state.actionButtonTitle} onPress={this.startGame} />
+                        </Col>
+                        <Col size={1}></Col>
+                    </Row>
+                </Grid>
             </Grid>
         )
     }

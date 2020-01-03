@@ -17,6 +17,7 @@ import GridTutorial from "./games/tutorials/GridTutorial";
 import PicturesTutorial from "./games/tutorials/PicturesTutorial"
 import QuotesTutorial from "./games/tutorials/QuotesTutorial"
 import Scores from "./Scores"
+import Tutorials from "./games/Tutorials"
 
 const MainNavigator = createStackNavigator({
     Home: {
@@ -48,6 +49,9 @@ const MainNavigator = createStackNavigator({
     },
     Scores: {
         screen: Scores
+    },
+    Tutorials: {
+        screen: Tutorials
     }
 }, {
     initialRouteName: "Home",

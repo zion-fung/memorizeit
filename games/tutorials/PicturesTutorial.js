@@ -23,10 +23,6 @@ export default class PicturesTutorial extends Component {
                     <Text style={styles.space}>Click this button to start the game:</Text>
                     <Button title="Start" onPress={() => { }} />
                 </View>
-                <View style={{ marginTop: 15, marginLeft: 35, marginRight: 35 }}>
-                    <Text style={styles.space}>Click this button to check your answer (same button):</Text>
-                    <Button title="Check" onPress={() => { }} />
-                </View>
                 <View style={{ marginTop: 15 }}>
                     <Text h4>These are the 4 possible emoticons:</Text>
                 </View>
@@ -38,9 +34,9 @@ export default class PicturesTutorial extends Component {
                 </View>
                 <View>
                     <Text h3 style={styles.space}>How to play:</Text>
-                    <Text style={styles.space}>Press the start button to start the game. When the game is running, the button title changes to "Check".</Text>
+                    <Text style={styles.space}>Press the start button to start the game.</Text>
                     <Text style={styles.space}>After you press start, 5 emoticons will flash in a sequence in the window. Memorize the order that they appear in.</Text>
-                    <Text style={styles.space}>Once all the emoticons have appeared, press check to see if you remembered it correctly. In the check screen, each emoticon is a button that adds it to your answer. When you think you have it right, press the submit button. A popup will appear telling you if you were correct or not.</Text>
+                    <Text style={styles.space}>Once all the emoticons have appeared, you will be taken to the another screen to enter your answer. Press the emoticons at the bottom to enter your answer. When you think you have it right, press the submit button. A popup will appear telling you if you were correct or not.</Text>
                 </View>
             </ScrollView>
         )

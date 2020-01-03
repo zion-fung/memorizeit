@@ -109,6 +109,15 @@ class Home extends Component {
                             onPress={() => navigate("Scores")}
                         />
                     </View>
+                    <View
+                        style={{ flexGrow: 1, width: "66%" }}
+                    >
+                        <Button
+                            raised
+                            title="How to play"
+                            onPress={() => navigate("Tutorials")}
+                        />
+                    </View>
                     <View style={{ flexGrow: 1 }}></View>
                 </View>
             </LinearGradient>
